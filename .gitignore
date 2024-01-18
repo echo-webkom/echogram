@@ -1,0 +1,7 @@
+.env
+main
+local.settings.json
+
+terraform/*.tfvars
+terraform/.terraform
+terraform/*.tfstate
