@@ -1,11 +1,25 @@
 package images
 
-import "os"
+import (
+	"os"
 
-func getCredentials() (string, string, string) {
-	accountName := os.Getenv("AZURE_STORAGE_ACCOUNT_NAME")
-	accountKey := os.Getenv("AZURE_STORAGE_ACCOUNT_KEY")
-	containerName := os.Getenv("AZURE_STORAGE_CONTAINER_NAME")
+	"github.com/echo-webkom/echo-blob/services"
+)
 
-	return accountName, accountKey, containerName
+func getBlobManager() (services.BlobManager, error) {
+	if os.Getenv("ENV") == "dev" {
+		lm, err := services.NewLocalBlobManager()
+		if err != nil {
+			return nil, err
+		}
+
+		return lm, nil
+	}
+
+	am, err := services.NewAzureBlobManager()
+	if err != nil {
+		return nil, err
+	}
+
+	return am, nil
 }
