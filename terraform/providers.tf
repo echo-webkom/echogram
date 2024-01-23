@@ -13,5 +13,5 @@ provider "azurerm" {
 
 locals {
   location    = "norwayeast"
-  environment = "dev"
+  environment = "prod"
 }

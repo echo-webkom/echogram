@@ -1,5 +1,5 @@
 resource "azurerm_function_app" "function" {
-  name                = "${var.prefix}-function-app"
+  name                = var.prefix
   resource_group_name = var.rg_name
   location            = var.location
   app_service_plan_id = azurerm_app_service_plan.asp.id
@@ -8,8 +8,7 @@ resource "azurerm_function_app" "function" {
     "WEBSITE_RUN_FROM_PACKAGE"       = "",
     "FUNCTION_WORKER_RUNTIME"        = "custom",
     "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.insights.instrumentation_key,
-    # "AzureWebJobsStorage"            = azurerm_storage_account.sa.primary_connection_string,
-    "AzureWebJobsStorage" = var.sa_primary_connection_string,
+    "AzureWebJobsStorage"            = var.sa_primary_connection_string,
   }
 
   os_type = "linux"
@@ -19,9 +18,7 @@ resource "azurerm_function_app" "function" {
 
   storage_account_name       = var.sa_name
   storage_account_access_key = var.sa_primary_access_key
-  # storage_account_name       = azurerm_storage_account.sa.name
-  # storage_account_access_key = azurerm_storage_account.sa.primary_access_key
-  version = "~4"
+  version                    = "~4"
 
   lifecycle {
     ignore_changes = [
@@ -33,14 +30,6 @@ resource "azurerm_function_app" "function" {
     project = "${var.prefix}"
   }
 }
-
-# resource "azurerm_storage_account" "sa" {
-#   name                     = "${var.prefix}storage"
-#   resource_group_name      = var.rg_name
-#   location                 = var.location
-#   account_tier             = "Standard"
-#   account_replication_type = "LRS"
-# }
 
 resource "azurerm_application_insights" "insights" {
   name                = "${var.prefix}-application-insights"
