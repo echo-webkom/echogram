@@ -50,4 +50,4 @@ az functionapp config appsettings set \
         AZURE_STORAGE_CONTAINER_NAME=$AZURE_STORAGE_CONTAINER_NAME \
     --output none
 
-echo "Success"
+echo "Success!"
