@@ -7,15 +7,16 @@ import (
 	"log"
 	"net/url"
 	"path/filepath"
+	"strings"
 
 	"github.com/Azure/azure-storage-blob-go/azblob"
 	"github.com/gofiber/fiber/v2"
 )
 
-func HandleGetImageByFilename(c *fiber.Ctx) error {
-	filename := c.Query("filename")
-	if filename == "" {
-		return c.Status(200).SendString("Add ?filename=<filename> to the URL to get an image")
+func HandleGetImageByUserId(c *fiber.Ctx) error {
+	userId := c.Query("userId")
+	if userId == "" {
+		return c.Status(400).SendString("Add ?userId=<userId> to the URL to get an image")
 	}
 
 	accountName, accountKey, containerName := getCredentials()
@@ -23,10 +24,7 @@ func HandleGetImageByFilename(c *fiber.Ctx) error {
 		return c.Status(500).SendString("Storage account information is not configured")
 	}
 
-	URL, err := url.Parse(fmt.Sprintf("https://%s.blob.core.windows.net/%s", accountName, containerName))
-	if err != nil {
-		return c.Status(500).SendString("Failed to parse URL")
-	}
+	URL, _ := url.Parse(fmt.Sprintf("https://%s.blob.core.windows.net/%s", accountName, containerName))
 
 	creds, err := azblob.NewSharedKeyCredential(accountName, accountKey)
 	if err != nil {
@@ -35,13 +33,31 @@ func HandleGetImageByFilename(c *fiber.Ctx) error {
 
 	pipeline := azblob.NewPipeline(creds, azblob.PipelineOptions{})
 	containerURL := azblob.NewContainerURL(*URL, pipeline)
-	blobURL := containerURL.NewBlobURL(filename)
 
 	ctx := context.Background()
+	listBlobs, err := containerURL.ListBlobsFlatSegment(ctx, azblob.Marker{}, azblob.ListBlobsSegmentOptions{})
+	if err != nil {
+		log.Println(err)
+		return c.Status(500).SendString("Failed to list blobs: " + err.Error())
+	}
+
+	var foundBlob *azblob.BlobItemInternal
+	for _, blob := range listBlobs.Segment.BlobItems {
+		if strings.HasPrefix(blob.Name, userId+".") && validImageType(blob.Name) {
+			foundBlob = &blob
+			break
+		}
+	}
+
+	if foundBlob == nil {
+		return c.Status(404).SendString("Image not found")
+	}
+
+	blobURL := containerURL.NewBlobURL(foundBlob.Name)
 	downloadResponse, err := blobURL.Download(ctx, 0, azblob.CountToEnd, azblob.BlobAccessConditions{}, false, azblob.ClientProvidedKeyOptions{})
 	if err != nil {
 		log.Println(err)
-		return c.Status(404).SendString("Image not found: " + err.Error())
+		return c.Status(404).SendString("Failed to download image: " + err.Error())
 	}
 
 	bodyStream := downloadResponse.Body(azblob.RetryReaderOptions{MaxRetryRequests: 3})
@@ -52,11 +68,6 @@ func HandleGetImageByFilename(c *fiber.Ctx) error {
 		return c.Status(500).SendString("Error reading blob data")
 	}
 
-	// _, err = os.Create(filename)
-	// if err != nil {
-	// 	return c.Status(500).SendString("Error creating file")
-	// }
-
-	c.Type(filepath.Ext(filename))
+	c.Type(filepath.Ext(foundBlob.Name))
 	return c.Status(200).Send(data)
 }

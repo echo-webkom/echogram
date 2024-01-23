@@ -1,6 +1,9 @@
 package images
 
-import "os"
+import (
+	"os"
+	"strings"
+)
 
 func getCredentials() (string, string, string) {
 	accountName := os.Getenv("AZURE_STORAGE_ACCOUNT_NAME")
@@ -8,4 +11,14 @@ func getCredentials() (string, string, string) {
 	containerName := os.Getenv("AZURE_STORAGE_CONTAINER_NAME")
 
 	return accountName, accountKey, containerName
+}
+
+func validImageType(filename string) bool {
+	validTypes := []string{".jpg", ".jpeg", ".png", ".gif"}
+	for _, validType := range validTypes {
+		if strings.HasSuffix(filename, validType) {
+			return true
+		}
+	}
+	return false
 }
