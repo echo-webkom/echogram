@@ -1,7 +1,7 @@
 #!/bin/bash
 
-FUNCTION_APP_NAME=torger-function-app
-RESOURCE_GROUP_NAME=torger-resources
+FUNCTION_APP_NAME=echo-images
+RESOURCE_GROUP_NAME=echo-images-resources
 
 if [ -f handler ]; then
     rm main
