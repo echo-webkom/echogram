@@ -15,8 +15,9 @@ func main() {
 	// TODO: add auth middleware
 	// jwt := newAuthMiddleware(os.Getenv("SIGNING_KEY"))
 
-	app.Get("/api/images", images.HandleGetImageByFilename)
+	app.Get("/api/images", images.HandleGetImageByUserId)
 	app.Post("/api/images", images.HandlePostImages)
+	app.Delete("/api/images", images.HandleDeleteImageByUserId)
 
 	listenAddr := ":8080"
 	if val, ok := os.LookupEnv("FUNCTIONS_CUSTOMHANDLER_PORT"); ok {
