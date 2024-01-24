@@ -9,7 +9,7 @@ build:
 	@$(GO) build -o $(BIN) $(PKG)
 
 run: build
-	@./$(BIN)
+	@ENV="dev" ./$(BIN)
 
 clean:
 	@$(GO) clean $(PKG)
