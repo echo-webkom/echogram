@@ -19,7 +19,7 @@ func newAPIKeyAuth(c *fiber.Ctx) error {
 }
 
 func validateAPIKey(c *fiber.Ctx, key string) (bool, error) {
-	if key == "1234" {
+	if key == os.Getenv("API_KEY") {
 		return true, nil
 	}
 	return false, keyauth.ErrMissingOrMalformedAPIKey
