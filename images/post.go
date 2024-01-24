@@ -9,7 +9,7 @@ import (
 func HandlePostImages(c *fiber.Ctx) error {
 	req, err := c.FormFile("image")
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("ERROR", err)
 		return c.Status(500).SendString("Failed to decode image")
 	}
 

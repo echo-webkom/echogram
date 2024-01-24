@@ -2,14 +2,15 @@ package images
 
 import (
 	"path/filepath"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func HandleGetImageByFilename(c *fiber.Ctx) error {
-	filename := c.Query("filename")
-	if filename == "" {
-		return c.Status(200).SendString("Add ?filename=<filename> to the URL to get an image")
+func HandleGetImageByUserId(c *fiber.Ctx) error {
+	userId := c.Query("userId")
+	if userId == "" {
+		return c.Status(400).SendString("Add ?userId=<userId> to the URL to get an image")
 	}
 
 	bm, err := getBlobManager()

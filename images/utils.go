@@ -23,3 +23,13 @@ func getBlobManager() (services.BlobManager, error) {
 
 	return am, nil
 }
+
+func validImageType(filename string) bool {
+	validTypes := []string{".jpg", ".jpeg", ".png", ".gif"}
+	for _, validType := range validTypes {
+		if strings.HasSuffix(filename, validType) {
+			return true
+		}
+	}
+	return false
+}
