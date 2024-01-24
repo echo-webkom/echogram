@@ -7,6 +7,7 @@ import (
 	images "github.com/echo-webkom/echo-blob/images"
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
+	cors "github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
@@ -14,6 +15,13 @@ func main() {
 
 	// TODO: add auth middleware
 	// jwt := newAuthMiddleware(os.Getenv("SIGNING_KEY"))
+
+	app.Use(cors.New(
+		cors.Config{
+			AllowOrigins: "https://echo.uib.no, http://localhost:3000",
+			AllowHeaders: "Origin, Content-Type, Accept",
+		},
+	))
 
 	app.Get("/api/images", images.HandleGetImageByUserId)
 	app.Post("/api/images", images.HandlePostImages)
